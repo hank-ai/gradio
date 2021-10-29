@@ -44,6 +44,10 @@ app = Flask(__name__,
             template_folder=STATIC_TEMPLATE_LIB,
             static_folder=STATIC_PATH_LIB,
             static_url_path="/static/")
+print("STATIC_TEMPLATE_LIB", app.template_folder)
+print("STATIC_PATH_LIB", app.static_folder)
+print("STATIC_URL_PATH", app.static_url_path)
+
 CORS(app)
 cache_buster = CacheBuster(
     config={'extensions': ['.js', '.css'], 'hash_size': 5})
@@ -122,6 +126,9 @@ def get_first_available_port(initial, final):
 
 
 def home_page(examples=None, path=None):
+    print("STATIC_TEMPLATE_LIB", app.template_folder)
+    print("STATIC_PATH_LIB", app.static_folder)
+    print("STATIC_URL_PATH", app.static_url_path)
     return render_template("index.html",
                            config=app.interface.config,
                            vendor_prefix=(
@@ -398,8 +405,7 @@ def file(path):
     else:
         return send_file(os.path.join(app.cwd, path))
 
-
-def start_server(interface, server_name, server_port=None, auth=None, ssl=None):
+def start_server(interface, server_name, server_port=None, auth=None, ssl=None, static_url_path=None, static_folder=None, template_folder=None):
     if server_port is None:
         server_port = INITIAL_PORT_VALUE
     port = get_first_available_port(
@@ -409,6 +415,10 @@ def start_server(interface, server_name, server_port=None, auth=None, ssl=None):
         app.auth = {account[0]: account[1] for account in auth}
     else:
         app.auth = None
+    if static_url_path is not None: app.static_url_path = static_url_path
+    if static_folder is not None: app.static_folder = static_folder
+    if template_folder is not None: app.template_folder = template_folder
+
     app.interface = interface
     app.cwd = os.getcwd()
     log = logging.getLogger('werkzeug')
